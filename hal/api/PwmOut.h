@@ -125,6 +125,15 @@ public:
         core_util_critical_section_exit();
     }
 
+    /** Set the PWM period, specified in freq (int), keeping the duty cycle the same.
+     * Note: PWM base clock count rate is 10MHz. (we set it in pwmout_api.c)
+	 */
+	void period_rate(uint64_t freq) {
+		core_util_critical_section_enter();
+		pwmout_period_freq(&_pwm, freq);
+		core_util_critical_section_exit();
+	}
+
     /** Set the PWM pulsewidth, specified in seconds (float), keeping the period the same.
      */
     void pulsewidth(float seconds) {
@@ -147,6 +156,14 @@ public:
         core_util_critical_section_enter();
         pwmout_pulsewidth_us(&_pwm, us);
         core_util_critical_section_exit();
+    }
+
+    /** Set the PWM duty cycle, specified in permillage (int), keeping the period the same.
+     */
+    void dutycycle(int ratio) {
+    	core_util_critical_section_enter();
+    	pwmout_duty_permille(&_pwm, ratio);
+		core_util_critical_section_exit();
     }
 
     /** A operator shorthand for write()
