@@ -126,7 +126,7 @@ typedef enum {
     ADC_PIN1A = PB_8, // Another pin name for ADC 1
     ADC_PIN2  = PD_9,
 
-    LED1    = GPIO_PIN0,
+    LED1    = GPIO_PIN21,
     LED2    = GPIO_PIN1,
     LED3    = GPIO_PIN2,
     LED4    = GPIO_PIN3,
