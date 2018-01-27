@@ -83,6 +83,13 @@ void pwmout_period_ms(pwmout_t *obj, int ms);
  */
 void pwmout_period_us(pwmout_t *obj, int us);
 
+/** Set the PWM period specified in base ticks, keeping the duty cycle the same
+ *
+ * @param obj The pwmout object
+ * @param ticks  The ticks period
+ */
+void pwmout_period_freq(pwmout_t * obj, uint64_t freq);
+
 /** Set the PWM pulsewidth specified in seconds, keeping the period the same.
  *
  * @param obj     The pwmout object
@@ -103,6 +110,13 @@ void pwmout_pulsewidth_ms(pwmout_t *obj, int ms);
  * @param us  The floating-point pulsewidth in microseconds
  */
 void pwmout_pulsewidth_us(pwmout_t *obj, int us);
+
+/** Set the PWM duty cycle specified in permillage, keeping the period the same.
+ *
+ * @param obj The pwmout object
+ * @param us  The floating-point pulsewidth in microseconds
+ */
+void pwmout_duty_permille(pwmout_t* obj, int ratio);
 
 /**@}*/
 
