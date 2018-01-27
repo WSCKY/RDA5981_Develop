@@ -13,6 +13,7 @@ mbed_settings.py
 .build/
 .mbed
 venv/
+BUILD/
 
 # Eclipse Project Files
 .cproject
