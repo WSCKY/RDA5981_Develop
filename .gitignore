@@ -19,6 +19,7 @@ BUILD/
 .cproject
 .project
 .pydevproject
+.settings/
 
 # C extensions
 *.so
