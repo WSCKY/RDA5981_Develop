@@ -76,10 +76,12 @@ void pwmout_init(pwmout_t* obj, PinName pin)
 
     /* Init PWM clock source and divider */
     if(PWM_4 >= pwm) {
-        /* Src: 20MHz, Divider: (3 + 1) */
+        /* Src: 20MHz, Divider: (1 + 1) */
         reg_val = PWM_CLKSRC_REG & ~0x0000FFUL;
-        PWM_CLKSRC_REG = reg_val | (0x01UL << 7) | 0x03UL | (0x01UL << 24);
-        obj->base_clk = (PWM_CLK_SRC_20MHZ >> 2) >> 1;
+        /* set pwm base clock to 10MHz (for PWM0, PWM1, PWM2, PWM3, PWM4) */
+        PWM_CLKSRC_REG = reg_val | (0x01UL << 7) | 0x00UL | (0x01UL << 24); /* 0x00UL -> Divider:(0 + 1), have question??? */
+        /* compute counter clock rate */
+        obj->base_clk = (PWM_CLK_SRC_20MHZ >> 1); /* base clock = 20MHz / 2 = 10MHz */
     } else if(PWM_5 == pwm) {
         /* Src: 32KHz, Divider: (0 + 1) */
         reg_val = PWM_CLKSRC_REG & ~0x00FF00UL;
@@ -183,6 +185,36 @@ void pwmout_period_us(pwmout_t* obj, int us)
     pwmout_start(obj);
 }
 
+/* Set the PWM period in freq, keeping the duty cycle the same. */
+void pwmout_period_freq(pwmout_t * obj, uint64_t freq)
+{
+	uint32_t ticks;
+
+	MBED_ASSERT(PWM_7 >= (PWMName)(obj->channel));
+
+	/* Check if already started */
+	if(is_pwmout_started(obj))
+		pwmout_stop(obj);
+
+	/* Calculate number of ticks */
+	ticks = (uint64_t)obj->base_clk / freq;
+
+	if(ticks != obj->period_ticks) {
+		float duty_ratio;
+
+		/* Preserve the duty ratio */
+		duty_ratio = (float)obj->pulsewidth_ticks / (float)obj->period_ticks;
+		obj->period_ticks = ticks;
+		obj->pulsewidth_ticks = (uint32_t)(ticks * duty_ratio);
+		MBED_ASSERT(obj->period_ticks >= obj->pulsewidth_ticks);
+
+		pwmout_update_cfgreg(obj);
+	}
+
+	/* Start PWM module */
+	pwmout_start(obj);
+}
+
 void pwmout_pulsewidth(pwmout_t* obj, float seconds)
 {
     pwmout_pulsewidth_us(obj, seconds * 1000000.0f);
@@ -216,6 +248,30 @@ void pwmout_pulsewidth_us(pwmout_t* obj, int us)
 
     /* Start PWM module */
     pwmout_start(obj);
+}
+
+void pwmout_duty_permille(pwmout_t* obj, int ratio)
+{
+	uint32_t ticks;
+
+	MBED_ASSERT(PWM_7 >= (PWMName)(obj->channel));
+
+	/* Check if already started (whether necessary?) */
+	if(is_pwmout_started(obj))
+		pwmout_stop(obj);
+
+	/* Calculate number of ticks */
+	ticks = (uint64_t)obj->period_ticks * ratio / 1000;
+
+	if(ticks != obj->pulsewidth_ticks) {
+		obj->pulsewidth_ticks = ticks;
+		MBED_ASSERT(obj->period_ticks >= obj->pulsewidth_ticks);
+
+		pwmout_update_cfgreg(obj);
+	}
+
+	/* Start PWM module */
+	pwmout_start(obj);
 }
 
 static uint8_t is_pwmout_started(pwmout_t* obj)
