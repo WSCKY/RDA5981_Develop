@@ -154,7 +154,7 @@
 #define MEMP_NUM_NETCONN            4
 #endif
 
-#define LWIP_SOCKET_OFFSET          555
+//#define LWIP_SOCKET_OFFSET          555
 
 #define TCP_QUEUE_OOSEQ             1
 #define TCP_OVERSIZE                0
