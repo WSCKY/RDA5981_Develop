@@ -241,6 +241,8 @@ static inline void spi_write(spi_t *obj, int value)
     /* Set start bit */
     obj->spi->CFG |= 0x01UL;
 #endif /* ENABLE_RDA_SPI_MODE */
+    /* wait spi bus start. */
+    while(!spi_busy(obj));
     while(spi_busy(obj));
 }
 
