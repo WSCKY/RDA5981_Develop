@@ -2,7 +2,7 @@
 #include "rda5981_flash.h"
 
 /* Supported pins: ADC_PIN0, ADC_PIN1(U02)/ADC_PIN1A(U04), ADC_PIN2(VBAT) */
-mbed::AnalogIn ain(ADC_PIN2);
+mbed::AnalogIn ain(ADC_PIN0);
 float k = 0;
 float b = 0;
 float voltage = 0;
